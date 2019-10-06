@@ -34,6 +34,14 @@ public class ShopController {
                        @RequestParam(name = "pageNumber", required = false) Integer pageNumber
                        // @RequestParam Map<String, String> params
     ) {
+        try{
+            if (request.getUserPrincipal().getName() != null) {
+                model.addAttribute("userName", request.getUserPrincipal().getName());
+            }
+        } catch (NullPointerException e) {
+
+        }
+
         ProductsFilter productsFilter = new ProductsFilter(request);
         if (pageNumber == null || pageNumber < 1) {
             pageNumber = 1;

@@ -5,13 +5,18 @@ import com.geekbrains.septembermarket.entities.User;
 import com.geekbrains.septembermarket.repositories.UserRepository;
 import com.geekbrains.septembermarket.services.MailService;
 import com.geekbrains.septembermarket.services.OrderService;
+import com.geekbrains.septembermarket.services.ProductsService;
 import com.geekbrains.septembermarket.services.UserService;
 import com.geekbrains.septembermarket.utils.Cart;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
 @Controller
@@ -19,7 +24,14 @@ import java.security.Principal;
 public class OrderController {
     private OrderService orderService;
     private UserService userService;
-    private MailService mailService;
+//    private MailService mailService;
+
+    private Cart cart;
+
+    @Autowired
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
 
     @Autowired
     public void setUserService(UserService userService) {
@@ -31,15 +43,38 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    public void setMailService(MailService mailService) {
-        this.mailService = mailService;
+//    public void setMailService(MailService mailService) {
+//        this.mailService = mailService;
+//    }
+
+    @GetMapping()
+    public String showOrderForm(Model model, HttpServletRequest request) {
+        try{
+            if (request.getUserPrincipal().getName() != null) {
+                model.addAttribute("userName", request.getUserPrincipal().getName());
+            }
+        } catch (NullPointerException e) {
+
+        }
+
+        model.addAttribute("items", cart.getItems().values());
+        model.addAttribute("totalPrice", cart.getTotalPrice());
+        return "order_form";
     }
 
     @GetMapping("/create")
-    public String createOrder(Principal principal) {
-        User user = userService.findByUsername(principal.getName());
+    public String createOrder(HttpServletRequest request) {
+        User user = userService.findByUsername(request.getUserPrincipal().getName());
         Order order = orderService.createOrder(user);
-        mailService.sendOrderMail(order);
+//        mailService.sendOrderMail(order);
+        return "redirect:/shop";
+    }
+
+    @PostMapping("/create")
+    public String createOrderAnonymous(HttpServletRequest request) {
+        User user = userService.findByUsername(request.getUserPrincipal().getName());
+        Order order = orderService.createOrder(user);
+//        mailService.sendOrderMail(order);
         return "redirect:/shop";
     }
 }

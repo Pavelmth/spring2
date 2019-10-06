@@ -39,9 +39,18 @@ public class CartController {
     }
 
     @GetMapping("")
-    public String show(Model model, HttpSession session) {
+    public String show(Model model, HttpSession session, HttpServletRequest request) {
 //        Cart cartX = (Cart) session.getAttribute("scopedTarget.cart");
+        try{
+            if (request.getUserPrincipal().getName() != null) {
+                model.addAttribute("userName", request.getUserPrincipal().getName());
+            }
+        } catch (NullPointerException e) {
+
+        }
+
         model.addAttribute("items", cart.getItems().values());
+        model.addAttribute("totalPrice", cart.getTotalPrice());
         return "cart";
     }
 

@@ -35,10 +35,14 @@
             <td th:text="${item.quantity}"/>
             <td th:text="${item.totalPrice}"/>
         </tr>
+        <tr>
+            <td></td>
+            <td>Полная стоимость</td>
+            <td th:text="${totalPrice}"/>
+        </tr>
         </tbody>
     </table>
-    <a th:if="${items.size() > 0}" sec:authorize="isAuthenticated()" th:href="@{/orders/create}" class="btn btn-warning">Оформить заказ</a>
-    <span th:if="${items.size() > 0}" sec:authorize="isAnonymous()">Для оформления заказа необходимо зайти в учетную запись</span>
+    <a th:if="${items.size() > 0}" th:href="@{/orders}" class="btn btn-warning">Оформить заказ</a>
 </div>
 
 </body>

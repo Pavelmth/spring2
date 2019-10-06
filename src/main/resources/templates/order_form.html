@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="utf-8"/>
+
+    <title>Форма заказа</title>
+
+    <link rel="icon" type="image/png" th:href="@{/favicon.ico}"/>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+<div class="container">
+    <div th:replace="~{navigation :: navigation(Cart)}"/>
+    <h1>Оформление заказа</h1>
+    <span th:if="${items.size() == 0}">Ваша корзина пуста</span>
+    <table th:if="${items.size() > 0}" class="table table-hover">
+        <thead class="thead-dark">
+        <tr>
+            <th>Название товара</th>
+            <th>Количество</th>
+            <th>Цена</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${items}">
+            <td th:text="${item.product.title}"/>
+            <td th:text="${item.quantity}"/>
+            <td th:text="${item.totalPrice}"/>
+        </tr>
+        <tr>
+            <td></td>
+            <td>Полная стоимость</td>
+            <td th:text="${totalPrice}"/>
+        </tr>
+        </tbody>
+    </table>
+    <br>
+
+    <form th:if="${items.size() > 0}" sec:authorize="isAuthenticated()" th:action="@{/orders/create}" method="GET">
+        <div class="form-group">
+            <label for="adress"></label>
+            <input th:value="${adress != null} ? ${adress}" th:name="adress" id="adress" type="text"
+                   placeholder="Адресс">
+        </div>
+        <button type="submit" class="btn btn-primary">Оформить заказ как <span th:text="${userName}"></span></button>
+    </form>
+
+    <form th:if="${items.size() > 0}" sec:authorize="isAnonymous()" th:action="@{/orders/create}" method="POST">
+        <div class="form-group">
+            <label for="name">по желанию</label>
+            <input th:value="${name}" th:name="name" id="name" type="text"
+                   placeholder="Имя">
+        </div>
+        <div class="form-group">
+            <label for="telephone"></label>
+            <input th:value="${telephone != null} ? ${telephone}" th:name="telephone" id="telephone" type="text"
+                   placeholder="Телефон">
+        </div>
+        <div class="form-group">
+            <label for="adress"></label>
+            <input th:value="${adress != null} ? ${adress}" th:name="adress" id="adress" type="text"
+                   placeholder="Адресс">
+        </div>
+        <button type="submit" class="btn btn-primary">Оформить заказ без регистрации</button>
+    </form>
+
+    <!--<a th:if="${items.size() > 0}" sec:authorize="isAuthenticated()" th:href="@{/orders/create}"-->
+       <!--class="btn btn-warning">Оформить заказ</a>-->
+    <!--<span th:if="${items.size() > 0}" sec:authorize="isAnonymous()">Для оформления заказа необходимо зайти в учетную запись</span>-->
+</div>
+
+</body>
+</html>

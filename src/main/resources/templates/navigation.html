@@ -51,6 +51,9 @@
                         </div>
                     </form>
                 </li>
+
+                <li sec:authorize="isAuthenticated()" th:text="${userName}" class="nav-item" style="color: firebrick">
+                </li>
             </ul>
         </div>
     </nav>
