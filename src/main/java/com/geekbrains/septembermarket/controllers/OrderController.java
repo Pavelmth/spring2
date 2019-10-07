@@ -8,6 +8,7 @@ import com.geekbrains.septembermarket.services.OrderService;
 import com.geekbrains.septembermarket.services.ProductsService;
 import com.geekbrains.septembermarket.services.UserService;
 import com.geekbrains.septembermarket.utils.Cart;
+import com.geekbrains.septembermarket.utils.SystemUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
@@ -63,18 +65,38 @@ public class OrderController {
     }
 
     @GetMapping("/create")
-    public String createOrder(HttpServletRequest request) {
+    public String createOrder(HttpServletRequest request,
+                              @RequestParam(name = "address", required = false) String address
+    ) {
         User user = userService.findByUsername(request.getUserPrincipal().getName());
         Order order = orderService.createOrder(user);
 //        mailService.sendOrderMail(order);
+        // адрес доставки в дольнейшем добавить в заказ.
         return "redirect:/shop";
     }
 
     @PostMapping("/create")
-    public String createOrderAnonymous(HttpServletRequest request) {
-        User user = userService.findByUsername(request.getUserPrincipal().getName());
+    public String createOrderAnonymous(HttpServletRequest request,
+                                       @RequestParam(name = "name", required = false) String name,
+                                       @RequestParam(name = "phone") String phone,
+                                       @RequestParam(name = "address") String address
+    ) {
+        //Создаем урезанную версию юзера.
+        SystemUser systemUser = new SystemUser();
+        if (name != null && !name.isEmpty()) {
+            systemUser.setUsername(name);
+        } else {
+            systemUser.setUsername("system");
+        }
+        systemUser.setEmail("system@system.com");
+        systemUser.setFirstName("system");
+        systemUser.setLastName("system");
+        systemUser.setPhone(phone);
+        systemUser.setPassword("eqwrgvravrfvarev");
+        User user = userService.save(systemUser);
         Order order = orderService.createOrder(user);
 //        mailService.sendOrderMail(order);
+        // адрес доставки в дольнейшем добавить в заказ.
         return "redirect:/shop";
     }
 }
